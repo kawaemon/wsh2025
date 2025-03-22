@@ -12,9 +12,12 @@ const SQLITE_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 
 let database: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
-const migration = fs
-  .readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../migrations/0005_flat_sleeper.sql'))
-  .toString();
+const mig = (s: string) => path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../migrations/' + s);
+
+const migration =
+  fs.readFileSync(mig('0005_flat_sleeper.sql')).toString() +
+  '\n' +
+  fs.readFileSync(mig('0006_new_sheva_callister.sql')).toString();
 
 console.log('migration loaded');
 console.log(migration);

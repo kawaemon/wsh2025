@@ -143,6 +143,7 @@ export const program = table(
     t.index('program_channel_id_idx').on(table.channelId),
     t.index('program_episode_id_idx').on(table.episodeId),
     t.index('program_start_at_idx').on(table.startAt),
+    t.index('program_start_end_at_idx').on(table.startAt, table.endAt),
   ],
 );
 export const programRelation = relations(program, ({ one }) => ({
