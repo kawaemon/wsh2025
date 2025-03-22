@@ -23,12 +23,7 @@ const config = {
             presets: [
               [
                 '@babel/preset-env',
-                {
-                  corejs: '3.41',
-                  // forceAllTransforms: true,
-                  targets: 'defaults',
-                  useBuiltIns: 'entry',
-                },
+                { targets: { "chrome": "130" } },
               ],
               ['@babel/preset-react', { runtime: 'automatic' }],
               ['@babel/preset-typescript'],
