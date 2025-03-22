@@ -28,7 +28,7 @@ export const CarouselSection = ({ module }: Props) => {
           data-scroll-restore={`carousel-${module.id}`}
         >
           {module.items.map((item) => (
-            <div key={item.id} className={`shrink-0 grow-0 snap-start`} style={{ width: `${itemWidth}px` }}>
+            <div key={item.id} className="shrink-0 grow-0 snap-center" style={{ width: `${itemWidth}px` }}>
               {item.series != null ? <SeriesItem series={item.series} /> : null}
               {item.episode != null ? <EpisodeItem episode={item.episode} /> : null}
             </div>
