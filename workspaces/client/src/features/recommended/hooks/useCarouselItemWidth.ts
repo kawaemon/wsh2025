@@ -1,31 +1,46 @@
-import { useEffect, useRef } from 'react';
-import { useUpdate } from 'react-use';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 const MIN_WIDTH = 276;
 const GAP = 12;
 
 // repeat(auto-fill, minmax(276px, 1fr)) を計算で求める
+// TODO: CSS でなんとかできると思う
 export function useCarouselItemWidth() {
-  const forceUpdate = useUpdate();
   const containerRef = useRef<HTMLDivElement>(null);
+  const resizeObserver = useRef<ResizeObserver>(null);
+  const [width, setWidth] = useState(MIN_WIDTH);
 
-  useEffect(() => {
-    const interval = setInterval(function tick() {
-      forceUpdate();
-    }, 250);
+  // TODO: layout effect にすべき？
+  useLayoutEffect(() => {
+    resizeObserver.current = new ResizeObserver((e) => {
+      update(e[0]?.target ?? null);
+    });
     return () => {
-      clearInterval(interval);
+      resizeObserver.current?.disconnect();
     };
   }, []);
 
-  if (containerRef.current == null) {
-    return { ref: containerRef, width: MIN_WIDTH };
-  }
+  const update = (div: Element | null) => {
+    if (div == null) {
+      setWidth(MIN_WIDTH);
+      return;
+    }
+    const styles = window.getComputedStyle(div);
+    const innerWidth = div.clientWidth - parseInt(styles.paddingLeft) - parseInt(styles.paddingRight);
+    const itemCount = Math.max(0, Math.floor((innerWidth + GAP) / (MIN_WIDTH + GAP)));
+    const itemWidth = Math.floor((innerWidth + GAP) / itemCount - GAP);
+    setWidth(itemWidth);
+  };
 
-  const styles = window.getComputedStyle(containerRef.current);
-  const innerWidth = containerRef.current.clientWidth - parseInt(styles.paddingLeft) - parseInt(styles.paddingRight);
-  const itemCount = Math.max(0, Math.floor((innerWidth + GAP) / (MIN_WIDTH + GAP)));
-  const itemWidth = Math.floor((innerWidth + GAP) / itemCount - GAP);
+  const onAttach = useCallback((element: HTMLDivElement | null) => {
+    if (containerRef.current != null) {
+      resizeObserver.current?.unobserve(containerRef.current);
+    }
+    containerRef.current = element;
+    if (element != null) {
+      resizeObserver.current?.observe(element);
+    }
+  }, []);
 
-  return { ref: containerRef, width: itemWidth };
+  return { ref: onAttach, width };
 }
