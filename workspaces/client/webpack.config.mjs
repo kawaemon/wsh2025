@@ -8,7 +8,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 const config = {
   devtool: "source-map",
   entry: './src/main.tsx',
-  mode: 'development',
+  mode:  "production",
   module: {
     rules: [
       {
