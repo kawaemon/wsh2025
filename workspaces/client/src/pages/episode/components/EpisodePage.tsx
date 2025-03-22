@@ -7,7 +7,6 @@ import { createStore } from '@wsh-2025/client/src/app/createStore';
 import { useAuthActions } from '@wsh-2025/client/src/features/auth/hooks/useAuthActions';
 import { useAuthUser } from '@wsh-2025/client/src/features/auth/hooks/useAuthUser';
 import { useEpisodeById } from '@wsh-2025/client/src/features/episode/hooks/useEpisodeById';
-import { AspectRatio } from '@wsh-2025/client/src/features/layout/components/AspectRatio';
 import { Player } from '@wsh-2025/client/src/features/player/components/Player';
 import { PlayerType } from '@wsh-2025/client/src/features/player/constants/player_type';
 import { RecommendedSection } from '@wsh-2025/client/src/features/recommended/components/RecommendedSection';
@@ -68,17 +67,11 @@ export const EpisodePage = () => {
             ) : (
               <Suspense
                 fallback={
-                  <AspectRatio ratioHeight={9} ratioWidth={16}>
-                    <div className="grid size-full">
-                      <img
-                        alt=""
-                        className="size-full place-self-stretch [grid-area:1/-1]"
-                        src={episode.thumbnailUrl}
-                      />
-                      <div className="size-full place-self-stretch bg-[#00000077] [grid-area:1/-1]" />
-                      <div className="i-line-md:loading-twotone-loop size-[48px] place-self-center text-[#ffffff] [grid-area:1/-1]" />
-                    </div>
-                  </AspectRatio>
+                  <div className="aspect-16/9 grid size-full">
+                    <img alt="" className="size-full place-self-stretch [grid-area:1/-1]" src={episode.thumbnailUrl} />
+                    <div className="size-full place-self-stretch bg-[#00000077] [grid-area:1/-1]" />
+                    <div className="i-line-md:loading-twotone-loop size-[48px] place-self-center text-[#ffffff] [grid-area:1/-1]" />
+                  </div>
                 }
               >
                 <div className="relative size-full">
