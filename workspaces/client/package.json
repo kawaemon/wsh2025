@@ -84,12 +84,12 @@
   },
   "wireit": {
     "build": {
-      "command": "webpack",
+      "command": "vite build",
       "files": [
         "../../pnpm-lock.yaml",
         "../schema/src/**/*",
         "./src/**/*",
-        "./webpack.config.mjs"
+        "./vite.config.ts"
       ],
       "output": [
         "./dist/**/*"
