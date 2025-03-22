@@ -1,5 +1,4 @@
 import eslint from '@eslint/js';
-import * as eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginImport from 'eslint-plugin-import';
 import eslintPluginReact from 'eslint-plugin-react';
 import eslintPluginSort from 'eslint-plugin-sort';
@@ -36,7 +35,7 @@ const configs = [
     rules: {
       ...eslint.configs.recommended.rules,
       ...tseslint.configs.strictTypeChecked.at(-1)?.rules,
-      ...eslintConfigPrettier.rules,
+      // ...eslintConfigPrettier.rules,
       ...eslintPluginImport.configs.recommended.rules,
       ...eslintPluginSort.configs.recommended.rules,
       ...eslintPluginReact.configs.recommended.rules,
@@ -59,15 +58,7 @@ const configs = [
       eqeqeq: ['error', 'always', { null: 'never' }],
       'import/no-named-as-default': ['off'],
       'import/no-named-as-default-member': ['off'],
-      'import/order': [
-        'error',
-        {
-          alphabetize: {
-            order: 'asc',
-          },
-          'newlines-between': 'always',
-        },
-      ],
+      'import/order': ['off'],
       'react/jsx-sort-props': [
         'error',
         {
@@ -78,7 +69,7 @@ const configs = [
         },
       ],
       'sort/imports': ['off'],
-      'sort/type-properties': ['error'],
+      'sort/type-properties': ['off'],
     },
     settings: {
       'import/parsers': {
