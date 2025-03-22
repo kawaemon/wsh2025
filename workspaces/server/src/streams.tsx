@@ -19,6 +19,8 @@ function getTime(d: Date): number {
 
 export function registerStreams(app: FastifyInstance): void {
   app.register(fastifyStatic, {
+    immutable: true,
+    maxAge: '30d',
     prefix: '/streams/',
     root: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../streams'),
   });
