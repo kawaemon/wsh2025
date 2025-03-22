@@ -27,8 +27,8 @@ function getFilePaths(relativePath: string, rootDir: string): string[] {
 
 export function registerSsr(app: FastifyInstance): void {
   app.register(fastifyStatic, {
-    prefix: '/public/',
     preCompressed: true,
+    prefix: '/public/',
     root: [
       path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist'),
       path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../public'),
