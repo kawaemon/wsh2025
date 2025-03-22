@@ -1,5 +1,4 @@
 import { imgHack } from '@wsh-2025/client/src/features/recommended/components/img';
-import Ellipsis from 'react-ellipsis-component';
 import { Flipped } from 'react-flip-toolkit';
 import { NavLink } from 'react-router';
 
@@ -23,9 +22,7 @@ export const SeriesItem = ({ series }: Props) => {
               </Flipped>
             </div>
             <div className="p-[8px]">
-              <div className="text-[14px] font-bold text-[#ffffff]">
-                <Ellipsis ellipsis reflowOnResize maxLine={2} text={series.title} visibleLine={2} />
-              </div>
+              <div className="line-clamp-2 text-[14px] font-bold text-[#ffffff]">{series.title}</div>
             </div>
           </>
         );
