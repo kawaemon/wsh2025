@@ -1,9 +1,9 @@
-import { DateTime } from 'luxon';
 import { useEffect, useRef } from 'react';
 import { Flipped } from 'react-flip-toolkit';
 import { Link, Params, useNavigate, useParams } from 'react-router';
 import { useUpdate } from 'react-use';
 import invariant from 'tiny-invariant';
+import dayjs from 'dayjs';
 
 import { createStore } from '@wsh-2025/client/src/app/createStore';
 import { Player } from '@wsh-2025/client/src/features/player/components/Player';
@@ -20,9 +20,9 @@ import { imgHack } from '@wsh-2025/client/src/features/recommended/components/im
 export const prefetch = async (store: ReturnType<typeof createStore>, { programId }: Params) => {
   invariant(programId);
 
-  const now = DateTime.now();
-  const since = now.startOf('day').toISO();
-  const until = now.endOf('day').toISO();
+  const now = dayjs();
+  const since = now.startOf('day').toISOString();
+  const until = now.endOf('day').toISOString();
 
   const [program, channels, timetable, modules] = await Promise.all([
     store.getState().features.program.fetchProgramById({ programId }),
@@ -43,7 +43,7 @@ export const ProgramPage = () => {
 
   const timetable = useTimetable();
   const nextProgram = timetable[program.channel.id]?.find((p) => {
-    return DateTime.fromISO(program.endAt).equals(DateTime.fromISO(p.startAt));
+    return dayjs(program.endAt).isSame(dayjs(p.startAt));
   });
 
   const modules = useRecommended({ referenceId: programId });

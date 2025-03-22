@@ -15,7 +15,7 @@ export default defineConfig({
     {
       name: 'Desktop Chrome',
       testMatch: '**/src/**/*.test.ts',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome' }, // chromiumはh264に対応していないためChromeを使用
+      use: { ...devices['Desktop Chrome'], channel: 'chromium' }, // chromiumはh264に対応していないためChromeを使用
     },
   ],
   reporter: 'list',
