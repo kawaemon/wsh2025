@@ -17,14 +17,6 @@ function getFilePaths(relativePath: string, rootDir: string): string[] {
   return files.map((file) => path.join('/', path.relative(rootDir, file)));
 }
 
-interface Cached {
-  mime: string;
-  data: Buffer;
-  encoding: string | null;
-}
-
-const cache: Record<string, Cached> = {};
-
 function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   const mimeTypes: Record<string, string> = {
@@ -47,21 +39,9 @@ function getMimeType(filePath: string): string {
 
 export function registerSsr(app: FastifyInstance): void {
   app.get('/public/*', async (request, reply) => {
-    const param = (request.params as Record<string, string>)['*']!;
-
-    const c = cache[param];
-    if (c != null) {
-      if (c.encoding) {
-        reply.header('Content-Encoding', c.encoding);
-      }
-      reply.header('cache-control', 'public, max-age=2592000, immutable');
-      reply.type(c.mime).send(c.data);
-      return;
-    }
-
     const candidates = [
-      path.join(__dirname, '../../client/dist', param),
-      path.join(__dirname, '../../../public', param),
+      path.join(__dirname, '../../client/dist', (request.params as Record<string, string>)['*']!),
+      path.join(__dirname, '../../../public', (request.params as Record<string, string>)['*']!),
     ];
 
     for (const filePath of candidates) {
@@ -73,24 +53,18 @@ export function registerSsr(app: FastifyInstance): void {
       if (existsSync(brPath)) {
         reply.header('Content-Encoding', 'br');
         reply.header('cache-control', 'public, max-age=2592000, immutable');
-        const data = await fsp.readFile(brPath);
-        cache[param] = { mime, encoding: 'br', data };
-        reply.type(mime).send(data);
+        reply.type(mime).send(await fsp.readFile(brPath));
         return;
       }
       if (existsSync(gzPath)) {
         reply.header('Content-Encoding', 'gzip');
         reply.header('cache-control', 'public, max-age=2592000, immutable');
-        const data = await fsp.readFile(gzPath);
-        cache[param] = { mime, encoding: 'gzip', data };
-        reply.type(mime).send();
+        reply.type(mime).send(await fsp.readFile(gzPath));
         return;
       }
       if (existsSync(filePath)) {
         reply.header('cache-control', 'public, max-age=2592000, immutable');
-        const data = await fsp.readFile(filePath);
-        cache[param] = { mime, encoding: null, data };
-        reply.type(mime).send();
+        reply.type(mime).send(await fsp.readFile(filePath));
         return;
       }
     }
