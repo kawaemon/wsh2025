@@ -5,13 +5,19 @@ interface Params {
 }
 
 export function useRecommended({ referenceId }: Params) {
-  const state = useStore((s) => s);
+  const state = useStore((state) => {
+    const moduleIds = state.features.recommended.references[referenceId];
 
-  const moduleIds = state.features.recommended.references[referenceId];
+    const modules = (moduleIds ?? [])
+      .map((moduleId) => state.features.recommended.recommendedModules[moduleId])
+      .filter(<T>(m: T): m is NonNullable<T> => m != null);
 
-  const modules = (moduleIds ?? [])
-    .map((moduleId) => state.features.recommended.recommendedModules[moduleId])
-    .filter(<T>(m: T): m is NonNullable<T> => m != null);
+    return modules;
+  }, haveSameId);
 
-  return modules;
+  return state;
+}
+
+function haveSameId(a: Array<{ id: string }>, b: Array<{ id: string }>): boolean {
+  return a.every((a) => b.some((b) => a.id === b.id));
 }
