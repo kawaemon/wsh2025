@@ -84,16 +84,7 @@
   },
   "wireit": {
     "build": {
-      "command": "vite build",
-      "files": [
-        "../../pnpm-lock.yaml",
-        "../schema/src/**/*",
-        "./src/**/*",
-        "./vite.config.ts"
-      ],
-      "output": [
-        "./dist/**/*"
-      ]
+      "command": "vite build && tsx compress.ts"
     },
     "format": {
       "command": "pnpm run format:eslint && pnpm run format:prettier"
