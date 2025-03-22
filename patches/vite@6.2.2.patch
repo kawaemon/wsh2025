@@ -1,0 +1,12 @@
+diff --git a/dist/node/chunks/dep-B0fRCRkQ.js b/dist/node/chunks/dep-B0fRCRkQ.js
+index 2e7276a7526d00d38f049bf20e440205589e70d8..043fe06254d6cc38dcd1174716be5015947351e5 100644
+--- a/dist/node/chunks/dep-B0fRCRkQ.js
++++ b/dist/node/chunks/dep-B0fRCRkQ.js
+@@ -49134,6 +49134,7 @@ async function compileCSS(environment, id, code, workerController, urlResolver)
+   try {
+     const source = removeDirectQuery(id);
+     const postcss = await importPostcss();
++	console.log(code);
+     postcssResult = await postcss.default(postcssPlugins).process(code, {
+       ...postcssOptions,
+       parser: postcssParser,

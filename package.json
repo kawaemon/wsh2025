@@ -25,7 +25,8 @@
       "m3u8-parser>@babel/runtime": "-"
     },
     "patchedDependencies": {
-      "shaka-player": "patches/shaka-player.patch"
+      "shaka-player": "patches/shaka-player.patch",
+      "vite@6.2.2": "patches/vite@6.2.2.patch"
     }
   },
   "wireit": {
