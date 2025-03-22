@@ -7,6 +7,7 @@ interface Props {
   ratioWidth: number;
 }
 
+// TODO: CSS でいける
 export const AspectRatio = ({ children, ratioHeight, ratioWidth }: Props) => {
   const forceUpdate = useUpdate();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +25,7 @@ export const AspectRatio = ({ children, ratioHeight, ratioWidth }: Props) => {
   const height = (width * ratioHeight) / ratioWidth;
 
   return (
-    <div ref={containerRef} className={`h-[${height}px] relative w-full`}>
+    <div ref={containerRef} className="relative w-full" style={{ height: `${height}px` }}>
       {children}
     </div>
   );

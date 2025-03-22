@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import UnoCSS from 'unocss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import react from '@vitejs/plugin-react';
 
@@ -19,5 +20,5 @@ export default defineConfig({
       NODE_ENV: 'production',
     },
   },
-  plugins: [react(), visualizer()],
+  plugins: [react(), UnoCSS(), visualizer()],
 });

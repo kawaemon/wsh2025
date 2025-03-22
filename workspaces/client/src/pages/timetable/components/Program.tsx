@@ -34,6 +34,7 @@ export const Program = ({ height, program }: Props): ReactElement => {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [shouldImageBeVisible, setShouldImageBeVisible] = useState<boolean>(false);
+  // FIXME:
   useEffect(() => {
     const interval = setInterval(() => {
       const imageHeight = imageRef.current?.clientHeight ?? 0;
@@ -48,20 +49,20 @@ export const Program = ({ height, program }: Props): ReactElement => {
   return (
     <>
       <button
-        className={`hover:${isArchived ? 'brightness-200' : 'brightness-125'} h-[${height}px] w-auto border-[1px] border-solid border-[#000000] bg-[${isBroadcasting ? '#FCF6E5' : '#212121'}] px-[12px] py-[8px] text-left opacity-${isArchived ? 50 : 100}`}
-        style={{ width }}
+        className={`${isArchived ? 'hover:brightness-200' : 'hover:brightness-125'} w-auto border-[1px] border-solid border-[#000000] ${isBroadcasting ? 'bg-[#FCF6E5]' : 'bg-[#212121]'} px-[12px] py-[8px] text-left ${isArchived ? 'opacity-50' : 'opacity-100'}`}
+        style={{ height: `${height}px`, width }}
         type="button"
         onClick={onClick}
       >
         <div className="flex size-full flex-col overflow-hidden">
           <div ref={titleRef} className="mb-[8px] flex flex-row items-start justify-start">
             <span
-              className={`mr-[8px] shrink-0 grow-0 text-[14px] font-bold text-[${isBroadcasting ? '#767676' : '#999999'}]`}
+              className={`mr-[8px] shrink-0 grow-0 text-[14px] font-bold ${isBroadcasting ? 'text-[#767676]' : 'text-[#999999]'}`}
             >
               {DateTime.fromISO(program.startAt).toFormat('mm')}
             </span>
             <div
-              className={`grow-1 shrink-1 overflow-hidden text-[14px] font-bold text-[${isBroadcasting ? '#212121' : '#ffffff'}]`}
+              className={`grow-1 shrink-1 overflow-hidden text-[14px] font-bold ${isBroadcasting ? 'text-[#212121]' : 'text-[#ffffff]'}`}
             >
               <Ellipsis ellipsis reflowOnResize maxLine={3} text={program.title} visibleLine={3} />
             </div>

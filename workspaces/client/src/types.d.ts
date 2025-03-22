@@ -16,3 +16,5 @@ declare module '*?arraybuffer' {
   const value: ArrayBuffer;
   export = value;
 }
+
+declare module 'virtual:uno.css' {}
