@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: '/public',
   build: {
+    modulePreload: true,
     rollupOptions: {
       output: {
         chunkFileNames: 'chunk-[hash].js',
