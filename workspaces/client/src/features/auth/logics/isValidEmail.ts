@@ -1,3 +1,5 @@
-export const isValidEmail = (email: string): boolean => {
-  return /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i.test(email);
+import { z } from 'zod';
+
+export const isValidEmail = (data: string): boolean => {
+  return z.string().email().safeParse(data).success;
 };
