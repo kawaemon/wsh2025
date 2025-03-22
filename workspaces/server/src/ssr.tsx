@@ -56,7 +56,6 @@ export function registerSsr(app: FastifyInstance): void {
     ];
 
     for (const filePath of candidates) {
-      console.log('trying: ' + filePath);
       const brPath = filePath + '.br';
       const gzPath = filePath + '.gz';
 
