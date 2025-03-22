@@ -39,6 +39,7 @@ export function useCarouselItemWidth() {
     containerRef.current = element;
     if (element != null) {
       resizeObserver.current?.observe(element);
+      update(element);
     }
   }, []);
 
