@@ -9,7 +9,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         chunkFileNames: 'chunk-[hash].js',
-        entryFileNames: 'main.js',
       },
     },
     target: ['chrome130'],

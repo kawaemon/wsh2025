@@ -12,6 +12,7 @@ import htmlescape from 'htmlescape';
 import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
+import dedent from 'dedent';
 
 function getFiles(parent: string): string[] {
   const dirents = readdirSync(parent, { withFileTypes: true });
@@ -27,6 +28,8 @@ function getFilePaths(relativePath: string, rootDir: string): string[] {
 
 export function registerSsr(app: FastifyInstance): void {
   app.register(fastifyStatic, {
+    immutable: true,
+    maxAge: '30d',
     preCompressed: true,
     prefix: '/public/',
     root: [
@@ -73,16 +76,19 @@ export function registerSsr(app: FastifyInstance): void {
       path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist/index.html'),
     ).toString();
 
-    reply.type('text/html').send(
-      html +
-        /* html */ `
-      <script>
-        window.__staticRouterHydrationData = ${htmlescape({
-          actionData: context.actionData,
-          loaderData: context.loaderData,
-        })};
-      </script>
-    `,
-    );
+    reply
+      .type('text/html')
+      .header('cache-control', 'no-store')
+      .send(
+        html +
+          /* html */ dedent`
+          <script>
+            window.__staticRouterHydrationData = ${htmlescape({
+              actionData: context.actionData,
+              loaderData: context.loaderData,
+            })};
+          </script>
+        `,
+      );
   });
 }

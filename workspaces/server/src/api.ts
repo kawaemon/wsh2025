@@ -52,6 +52,10 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
     routePrefix: '/docs',
   });
 
+  app.addHook('onSend', async (_req, reply) => {
+    reply.header('cache-control', 'no-store');
+  });
+
   const api = app.withTypeProvider<FastifyZodOpenApiTypeProvider>();
 
   /* eslint-disable sort/object-properties */
