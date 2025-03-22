@@ -16,7 +16,8 @@ interface EpisodePageActions {
   pause: () => void;
   play: () => void;
   playerRef: RefCallback<PlayerWrapper | null>;
-  setMuted: (muted: boolean) => void;
+  toggleMuted: () => void;
+  togglePlay: () => void;
   updateCurrentTime: (second: number) => void;
 }
 
@@ -92,10 +93,18 @@ export const createEpisodePageStoreSlice = () => {
       }
     },
     playing: false,
-    setMuted: (muted: boolean) => {
-      const { player } = get();
-      player?.setMuted(muted);
-      set(() => ({ muted }));
+    toggleMuted: () => {
+      const { muted, player } = get();
+      player?.setMuted(!muted);
+      set(() => ({ muted: !muted }));
+    },
+    togglePlay: () => {
+      const { pause, play, playing } = get();
+      if (playing) {
+        pause();
+      } else {
+        play();
+      }
     },
     updateCurrentTime: (second) => {
       const { player } = get();

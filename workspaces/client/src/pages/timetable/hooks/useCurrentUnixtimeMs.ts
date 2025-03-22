@@ -2,15 +2,17 @@ import { useEffect } from 'react';
 
 import { useStore } from '@wsh-2025/client/src/app/StoreContext';
 
+// TODO: なんとかならんかね
 export function useCurrentUnixtimeMs(): number {
-  const state = useStore((s) => s);
+  const state = useStore((s) => s.pages.timetable.currentUnixtimeMs);
+  const update = useStore((s) => s.pages.timetable.refreshCurrentUnixtimeMs);
   useEffect(() => {
     const interval = setInterval(() => {
-      state.pages.timetable.refreshCurrentUnixtimeMs();
+      update();
     }, 250);
     return () => {
       clearInterval(interval);
     };
   }, []);
-  return state.pages.timetable.currentUnixtimeMs;
+  return state;
 }

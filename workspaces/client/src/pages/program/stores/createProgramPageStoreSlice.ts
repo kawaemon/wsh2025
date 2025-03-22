@@ -10,7 +10,7 @@ interface ProgramPageState {
 
 interface ProgramPageActions {
   playerRef: RefCallback<PlayerWrapper | null>;
-  setMuted: (muted: boolean) => void;
+  toggleMuted: () => void;
 }
 
 export const createProgramPageStoreSlice = () => {
@@ -32,10 +32,10 @@ export const createProgramPageStoreSlice = () => {
         onUnmount();
       }
     },
-    setMuted: (muted: boolean) => {
-      const { player } = get();
-      player?.setMuted(muted);
-      set(() => ({ muted }));
+    toggleMuted: () => {
+      const { muted, player } = get();
+      player?.setMuted(!muted);
+      set(() => ({ muted: !muted }));
     },
   }));
 };

@@ -4,12 +4,8 @@ import { ArrayValues } from 'type-fest';
 
 import { useStore } from '@wsh-2025/client/src/app/StoreContext';
 
-type Program = ArrayValues<StandardSchemaV1.InferOutput<typeof schema.getTimetableResponse>>;
-
 export function useSelectedProgramId() {
-  const state = useStore((s) => s);
-  const setProgram = (program: Program | null) => {
-    state.pages.timetable.selectProgram(program);
-  };
-  return [state.pages.timetable.selectedProgramId, setProgram] as const;
+  const state = useStore((s) => s.pages.timetable.selectedProgramId);
+  const set = useStore((s) => s.pages.timetable.selectProgram);
+  return [state, set] as const;
 }
