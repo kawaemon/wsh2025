@@ -114,7 +114,7 @@ export const ProgramPage = () => {
                 </div>
               </div>
             ) : isBroadcastStarted ? (
-              <div className="relative size-full">
+              <div className="aspect-16/9 relative size-full">
                 <Player
                   className="size-full"
                   playerRef={playerRef}
