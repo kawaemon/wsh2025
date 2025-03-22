@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -60,29 +60,28 @@ export function registerSsr(app: FastifyInstance): void {
     );
 
     const rootDir = path.resolve(__dirname, '../../../');
-    const imagePaths = [
+    const _imagePaths = [
       getFilePaths('public/images', rootDir),
       getFilePaths('public/animations', rootDir),
       getFilePaths('public/logos', rootDir),
     ].flat();
 
-    reply.type('text/html').send(/* html */ `
-      <!DOCTYPE html>
-      <html lang="ja">
-        <head>
-          <meta charSet="UTF-8" />
-          <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-          <script type="module" src="/public/main.js"></script>
-          ${imagePaths.map((imagePath) => `<link as="image" href="${imagePath}" rel="preload" />`).join('\n')}
-        </head>
-        <body></body>
-      </html>
+    // ${imagePaths.map((imagePath) => `<link as="image" href="${imagePath}" rel="preload" />`).join('\n')}
+
+    const html = readFileSync(
+      path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist/index.html'),
+    ).toString();
+
+    reply.type('text/html').send(
+      html +
+        /* html */ `
       <script>
         window.__staticRouterHydrationData = ${htmlescape({
           actionData: context.actionData,
           loaderData: context.loaderData,
         })};
       </script>
-    `);
+    `,
+    );
   });
 }
