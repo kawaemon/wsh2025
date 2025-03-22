@@ -1,8 +1,8 @@
 import { StandardSchemaV1 } from '@standard-schema/spec';
 import * as schema from '@wsh-2025/schema/src/api/schema';
-import { DateTime } from 'luxon';
 import { ReactElement, useEffect, useRef, useState } from 'react';
 import { ArrayValues } from 'type-fest';
+import dayjs from 'dayjs';
 
 import { ProgramDetailDialog } from '@wsh-2025/client/src/pages/timetable/components/ProgramDetailDialog';
 import { useColumnWidth } from '@wsh-2025/client/src/pages/timetable/hooks/useColumnWidth';
@@ -26,9 +26,9 @@ export const Program = ({ height, program }: Props): ReactElement => {
 
   const currentUnixtimeMs = useCurrentUnixtimeMs();
   const isBroadcasting =
-    DateTime.fromISO(program.startAt).toMillis() <= DateTime.fromMillis(currentUnixtimeMs).toMillis() &&
-    DateTime.fromMillis(currentUnixtimeMs).toMillis() < DateTime.fromISO(program.endAt).toMillis();
-  const isArchived = DateTime.fromISO(program.endAt).toMillis() <= DateTime.fromMillis(currentUnixtimeMs).toMillis();
+    dayjs(program.startAt).valueOf() <= dayjs(currentUnixtimeMs).valueOf() &&
+    dayjs(currentUnixtimeMs).valueOf() < dayjs(program.endAt).valueOf();
+  const isArchived = dayjs(program.endAt).valueOf() <= dayjs(currentUnixtimeMs).valueOf();
 
   const titleRef = useRef<HTMLDivElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -59,7 +59,7 @@ export const Program = ({ height, program }: Props): ReactElement => {
             <span
               className={`mr-[8px] shrink-0 grow-0 text-[14px] font-bold ${isBroadcasting ? 'text-[#767676]' : 'text-[#999999]'}`}
             >
-              {DateTime.fromISO(program.startAt).toFormat('mm')}
+              {dayjs(program.startAt).format('mm')}
             </span>
             <div
               className={`grow-1 shrink-1 overflow-hidden text-[14px] font-bold ${isBroadcasting ? 'text-[#212121]' : 'text-[#ffffff]'} line-clamp-3`}
@@ -67,7 +67,7 @@ export const Program = ({ height, program }: Props): ReactElement => {
               {program.title}
             </div>
           </div>
-          <div className={`opacity-${shouldImageBeVisible ? 100 : 0} w-full`}>
+          <div className={`${shouldImageBeVisible ? 'opacity-100' : 'opacity-0'} w-full`}>
             <img
               ref={imageRef}
               alt=""
