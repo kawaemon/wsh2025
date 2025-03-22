@@ -486,33 +486,19 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
               return asc(item.order);
             },
             with: {
-              series: {
-                with: {
-                  episodes: {
-                    orderBy(episode, { asc }) {
-                      return asc(episode.order);
-                    },
-                  },
-                },
-              },
+              series: true,
               episode: {
                 with: {
-                  series: {
-                    with: {
-                      episodes: {
-                        orderBy(episode, { asc }) {
-                          return asc(episode.order);
-                        },
-                      },
-                    },
-                  },
+                  series: true,
                 },
               },
             },
           },
         },
       });
-      reply.code(200).send(modules);
+
+      const res = schema.getRecommendedModulesResponse.parse(modules);
+      reply.code(200).send(res);
     },
   });
 

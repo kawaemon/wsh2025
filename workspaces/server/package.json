@@ -8,7 +8,8 @@
     "format:eslint": "wireit",
     "format:prettier": "wireit",
     "heroku-start": "wireit",
-    "start": "wireit"
+    "start": "wireit",
+    "start:server": "wireit"
   },
   "dependencies": {
     "@fastify/cookie": "11.0.2",
@@ -84,6 +85,20 @@
       "dependencies": [
         "../client:build"
       ]
+    },
+    "start:server": {
+      "command": "tsx -r ./loaders/png.cjs ./src/index.ts",
+      "service": true,
+      "env": {
+        "API_BASE_URL": {
+          "external": true,
+          "default": "http://localhost:8000/api"
+        },
+        "PORT": {
+          "external": true,
+          "default": "8000"
+        }
+      }
     },
     "heroku-start": {
       "command": "tsx -r ./loaders/png.cjs ./src/index.ts",
