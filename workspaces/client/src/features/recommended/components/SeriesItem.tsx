@@ -1,3 +1,4 @@
+import { imgHack } from '@wsh-2025/client/src/features/recommended/components/img';
 import Ellipsis from 'react-ellipsis-component';
 import { Flipped } from 'react-flip-toolkit';
 import { NavLink } from 'react-router';
@@ -18,7 +19,7 @@ export const SeriesItem = ({ series }: Props) => {
           <>
             <div className="relative overflow-hidden rounded-[8px] border-[2px] border-solid border-[#FFFFFF1F]">
               <Flipped stagger flipId={isTransitioning ? `series-${series.id}` : 0}>
-                <img alt="" className="h-auto w-full" src={series.thumbnailUrl} />
+                <img alt="" className="h-auto w-full" loading="lazy" src={imgHack(series.thumbnailUrl)} />
               </Flipped>
             </div>
             <div className="p-[8px]">
