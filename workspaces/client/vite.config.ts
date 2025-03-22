@@ -11,6 +11,7 @@ export default defineConfig({
         entryFileNames: 'main.js',
       },
     },
+    target: ['chrome130'],
   },
   define: {
     'process.env': {
