@@ -7,6 +7,7 @@ import { ArrayValues } from 'type-fest';
 import { Dialog } from '@wsh-2025/client/src/features/dialog/components/Dialog';
 import { useEpisode } from '@wsh-2025/client/src/pages/timetable/hooks/useEpisode';
 import { useSelectedProgramId } from '@wsh-2025/client/src/pages/timetable/hooks/useSelectedProgramId';
+import { imgHack } from '@wsh-2025/client/src/features/recommended/components/img';
 
 interface Props {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export const ProgramDetailDialog = ({ isOpen, program }: Props): ReactElement =>
         <img
           alt=""
           className="mb-[24px] w-full rounded-[8px] border-[2px] border-solid border-[#FFFFFF1F]"
-          src={program.thumbnailUrl}
+          src={imgHack(program.thumbnailUrl)}
         />
 
         {episode != null ? (
@@ -47,7 +48,7 @@ export const ProgramDetailDialog = ({ isOpen, program }: Props): ReactElement =>
             <img
               alt=""
               className="mb-[24px] w-full rounded-[8px] border-[2px] border-solid border-[#FFFFFF1F]"
-              src={episode.thumbnailUrl}
+              src={imgHack(episode.thumbnailUrl)}
             />
           </>
         ) : null}

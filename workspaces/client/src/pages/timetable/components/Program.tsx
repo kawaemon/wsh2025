@@ -8,6 +8,7 @@ import { ProgramDetailDialog } from '@wsh-2025/client/src/pages/timetable/compon
 import { useColumnWidth } from '@wsh-2025/client/src/pages/timetable/hooks/useColumnWidth';
 import { useCurrentUnixtimeMs } from '@wsh-2025/client/src/pages/timetable/hooks/useCurrentUnixtimeMs';
 import { useSelectedProgramId } from '@wsh-2025/client/src/pages/timetable/hooks/useSelectedProgramId';
+import { imgHack } from '@wsh-2025/client/src/features/recommended/components/img';
 
 interface Props {
   height: number;
@@ -71,7 +72,7 @@ export const Program = ({ height, program }: Props): ReactElement => {
               ref={imageRef}
               alt=""
               className="pointer-events-none w-full rounded-[8px] border-[2px] border-solid border-[#FFFFFF1F]"
-              src={program.thumbnailUrl}
+              src={imgHack(program.thumbnailUrl)}
             />
           </div>
         </div>
