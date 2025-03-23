@@ -8,7 +8,6 @@ import * as bcrypt from 'bcrypt';
 
 import { getDatabase, initializeDatabase } from '@wsh-2025/server/src/drizzle/database';
 import { Hono } from 'hono';
-import { compress } from 'hono/compress';
 import * as cookie from 'hono/cookie';
 
 export function registerApi(): Hono {
@@ -18,8 +17,6 @@ export function registerApi(): Hono {
   const secret = randomBytes(32).toString('base64');
 
   const api = app;
-
-  api.use(compress());
 
   /* eslint-disable sort/object-properties */
   api.post('/initialize', async (c) => {
