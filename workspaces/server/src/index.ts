@@ -1,28 +1,27 @@
 import '@wsh-2025/server/src/setups/luxon';
 
-import cors from '@fastify/cors';
-import fastify from 'fastify';
-
 import { registerApi } from '@wsh-2025/server/src/api';
 import { initializeDatabase } from '@wsh-2025/server/src/drizzle/database';
+import { serve } from '@hono/node-server';
 import { registerSsr } from '@wsh-2025/server/src/ssr';
 import { registerStreams } from '@wsh-2025/server/src/streams';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 
 async function main() {
   await initializeDatabase();
 
-  const app = fastify();
+  const hono = new Hono();
 
-  app.register(cors, {
-    origin: true,
-  });
-  app.register(registerApi, { prefix: '/api' });
-  app.register(registerStreams);
-  app.register(registerSsr);
+  hono.use('*', cors());
 
-  await app.ready();
-  const address = await app.listen({ host: '0.0.0.0', port: Number(process.env['PORT']) });
-  console.log(`Server listening at ${address}`);
+  hono.route('/api', registerApi());
+  hono.route('/', registerStreams());
+  hono.route('/', registerSsr());
+
+  const port = Number(process.env['PORT']);
+  serve({ fetch: hono.fetch, port });
+  console.log(`Server listening at ${port}`);
 }
 
 void main();

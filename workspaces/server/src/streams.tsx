@@ -2,12 +2,12 @@ import { randomBytes } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import fastifyStatic from '@fastify/static';
 import dedent from 'dedent';
-import type { FastifyInstance } from 'fastify';
 import { DateTime } from 'luxon';
+import { serveStatic } from '@hono/node-server/serve-static';
 
 import { getDatabase } from '@wsh-2025/server/src/drizzle/database';
+import { Hono } from 'hono';
 
 const SEQUENCE_DURATION_MS = 2 * 1000;
 const SEQUENCE_COUNT_PER_PLAYLIST = 10;
@@ -17,22 +17,24 @@ function getTime(d: Date): number {
   return d.getTime() - DateTime.fromJSDate(d).startOf('day').toMillis();
 }
 
-export function registerStreams(app: FastifyInstance): void {
-  app.register(fastifyStatic, {
-    immutable: true,
-    maxAge: '30d',
-    prefix: '/streams/',
-    root: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../streams'),
-  });
+export function registerStreams(): Hono {
+  const app = new Hono();
+  app.use(
+    '/streams/',
+    serveStatic({
+      onFound: (_p, c) => {
+        c.header('cache-control', 'public, max-age=2592000, immutable');
+      },
+      root: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../streams'),
+    }),
+  );
 
-  app.get<{
-    Params: { episodeId: string };
-  }>('/streams/episode/:episodeId/playlist.m3u8', async (req, reply) => {
+  app.get('/streams/episode/:episodeId/playlist.m3u8', async (c) => {
     const database = getDatabase();
 
     const episode = await database.query.episode.findFirst({
       where(episode, { eq }) {
-        return eq(episode.id, req.params.episodeId);
+        return eq(episode.id, c.req.param('episodeId'));
       },
       with: {
         stream: true,
@@ -59,12 +61,11 @@ export function registerStreams(app: FastifyInstance): void {
       #EXT-X-ENDLIST
     `;
 
-    reply.type('application/vnd.apple.mpegurl').send(playlist);
+    c.header('Content-Type', 'application/vnd.apple.mpegurl');
+    return c.body(playlist);
   });
 
-  app.get<{
-    Params: { channelId: string };
-  }>('/streams/channel/:channelId/playlist.m3u8', async (req, reply) => {
+  app.get('/streams/channel/:channelId/playlist.m3u8', async (c) => {
     const database = getDatabase();
 
     const firstSequence = Math.floor(Date.now() / SEQUENCE_DURATION_MS) - SEQUENCE_COUNT_PER_PLAYLIST;
@@ -93,7 +94,7 @@ export function registerStreams(app: FastifyInstance): void {
           return and(
             lte(program.startAt, sql`time(${sequenceStartAt.toISOString()}, '+9 hours')`),
             lt(sql`time(${sequenceStartAt.toISOString()}, '+9 hours')`, program.endAt),
-            eq(program.channelId, req.params.channelId),
+            eq(program.channelId, c.req.param('channelId')),
           );
         },
         with: {
@@ -130,6 +131,9 @@ export function registerStreams(app: FastifyInstance): void {
       );
     }
 
-    reply.type('application/vnd.apple.mpegurl').send(playlist.join('\n'));
+    c.header('Content-Type', 'application/vnd.apple.mpegurl');
+    return c.body(playlist.join('\n'));
   });
+
+  return app;
 }

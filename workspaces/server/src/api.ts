@@ -2,44 +2,29 @@ import 'zod-openapi/extend';
 
 import { randomBytes } from 'node:crypto';
 
-import fastifyCookie from '@fastify/cookie';
-import fastifySession from '@fastify/session';
-import fastifyCompression from '@fastify/compress';
 import * as databaseSchema from '@wsh-2025/schema/src/database/schema';
 import * as schema from '@wsh-2025/schema/src/openapi/schema';
 import * as bcrypt from 'bcrypt';
-import type { FastifyInstance } from 'fastify';
-import { type FastifyZodOpenApiTypeProvider } from 'fastify-zod-openapi';
 
 import { getDatabase, initializeDatabase } from '@wsh-2025/server/src/drizzle/database';
+import { Hono } from 'hono';
+import * as cookie from 'hono/cookie';
 
-export async function registerApi(app: FastifyInstance): Promise<void> {
-  // app.setValidatorCompiler(validatorCompiler);
-  // app.setSerializerCompiler(serializerCompiler);
+export function registerApi(): Hono {
+  const app = new Hono();
 
-  await app.register(fastifyCompression, { removeContentLengthHeader: false, encodings: ['gzip', 'deflate'] });
-  await app.register(fastifyCookie);
-  await app.register(fastifySession, {
-    cookie: {
-      path: '/',
-    },
-    cookieName: 'wsh-2025-session',
-    secret: randomBytes(32).toString('base64'),
-  });
-
-  // app.addHook('onSend', (_req, reply) => {
-  //   reply.header('cache-control', 'no-store');
-  // });
+  const cookieName = 'wsh-2025-session';
+  const secret = randomBytes(32).toString('base64');
 
   const api = app;
 
   /* eslint-disable sort/object-properties */
-  api.post('/initialize', async (_req, reply) => {
+  api.post('/initialize', async (c) => {
     await initializeDatabase();
-    reply.code(200).send({});
+    return c.json({});
   });
 
-  api.get('/channels', async (req, reply) => {
+  api.get('/channels', async (c) => {
     const database = getDatabase();
 
     const channels = await database.query.channel.findMany({
@@ -47,31 +32,32 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         return asc(channel.id);
       },
       where(channel, { inArray }) {
-        if (req.query.channelIds != null) {
-          const channelIds = req.query.channelIds.split(',');
+        const ids = c.req.query('channelIds');
+        if (ids != null) {
+          const channelIds = ids.split(',');
           return inArray(channel.id, channelIds);
         }
         return void 0;
       },
     });
-    reply.code(200).send(channels);
+    return c.json(channels);
   });
 
-  api.get('/channels/:channelId', async (req, reply) => {
+  api.get('/channels/:channelId', async (c) => {
     const database = getDatabase();
 
     const channel = await database.query.channel.findFirst({
       where(channel, { eq }) {
-        return eq(channel.id, req.params.channelId);
+        return eq(channel.id, c.req.param('channelId'));
       },
     });
     if (channel == null) {
-      return reply.code(404).send();
+      return c.text('', 404);
     }
-    reply.code(200).send(channel);
+    return c.json(channel);
   });
 
-  api.get('/episodes', async (req, reply) => {
+  api.get('/episodes', async (c) => {
     const database = getDatabase();
 
     const episodes = await database.query.episode.findMany({
@@ -79,8 +65,9 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         return asc(episode.id);
       },
       where(episode, { inArray }) {
-        if (req.query.episodeIds != null) {
-          const episodeIds = req.query.episodeIds.split(',');
+        const ids = c.req.query('episodeIds');
+        if (ids != null) {
+          const episodeIds = ids.split(',');
           return inArray(episode.id, episodeIds);
         }
         return void 0;
@@ -97,15 +84,15 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         },
       },
     });
-    reply.code(200).send(episodes);
+    return c.json(episodes);
   });
 
-  api.get('/episodes/:episodeId', async (req, reply) => {
+  api.get('/episodes/:episodeId', async (c) => {
     const database = getDatabase();
 
     const episode = await database.query.episode.findFirst({
       where(episode, { eq }) {
-        return eq(episode.id, req.params.episodeId);
+        return eq(episode.id, c.req.param('episodeId'));
       },
       with: {
         series: {
@@ -120,12 +107,12 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
       },
     });
     if (episode == null) {
-      return reply.code(404).send();
+      return c.text('', 404);
     }
-    reply.code(200).send(episode);
+    return c.json(episode);
   });
 
-  api.get('/series', async (req, reply) => {
+  api.get('/series', async (c) => {
     const database = getDatabase();
 
     const series = await database.query.series.findMany({
@@ -133,8 +120,9 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         return asc(series.id);
       },
       where(series, { inArray }) {
-        if (req.query.seriesIds != null) {
-          const seriesIds = req.query.seriesIds.split(',');
+        const ids = c.req.query('seriesIds');
+        if (ids != null) {
+          const seriesIds = ids.split(',');
           return inArray(series.id, seriesIds);
         }
         return void 0;
@@ -150,15 +138,15 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         },
       },
     });
-    reply.code(200).send(series);
+    return c.json(series);
   });
 
-  api.get('/series/:seriesId', async (req, reply) => {
+  api.get('/series/:seriesId', async (c) => {
     const database = getDatabase();
 
     const series = await database.query.series.findFirst({
       where(series, { eq }) {
-        return eq(series.id, req.params.seriesId);
+        return eq(series.id, c.req.param('seriesId'));
       },
       with: {
         episodes: {
@@ -172,12 +160,12 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
       },
     });
     if (series == null) {
-      return reply.code(404).send();
+      return c.text('', 404);
     }
-    reply.code(200).send(series);
+    return c.json(series);
   });
 
-  api.get('/timetable', async (req, reply) => {
+  api.get('/timetable', async (c) => {
     const database = getDatabase();
 
     const programs = await database.query.program.findMany({
@@ -188,15 +176,16 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         // 競技のため、時刻のみで比較する
         return between(
           program.startAt,
-          sql`time(${req.query.since}, '+9 hours')`,
-          sql`time(${req.query.until}, '+9 hours')`,
+          sql`time(${c.req.query('since')}, '+9 hours')`,
+          sql`time(${c.req.query('until')}, '+9 hours')`,
         );
       },
     });
-    reply.code(200).send(programs);
+
+    return c.json(programs);
   });
 
-  api.get('/programs', async (req, reply) => {
+  api.get('/programs', async (c) => {
     const database = getDatabase();
 
     const programs = await database.query.program.findMany({
@@ -204,8 +193,9 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         return asc(program.startAt);
       },
       where(program, { inArray }) {
-        if (req.query.programIds != null) {
-          const programIds = req.query.programIds.split(',');
+        const ids = c.req.query('programIds');
+        if (ids != null) {
+          const programIds = ids.split(',');
           return inArray(program.id, programIds);
         }
         return void 0;
@@ -227,15 +217,16 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         },
       },
     });
-    reply.code(200).send(programs);
+
+    return c.json(programs);
   });
 
-  api.get('/programs/:programId', async (req, reply) => {
+  api.get('/programs/:programId', async (c) => {
     const database = getDatabase();
 
     const program = await database.query.program.findFirst({
       where(program, { eq }) {
-        return eq(program.id, req.params.programId);
+        return eq(program.id, c.req.param('programId'));
       },
       with: {
         channel: true,
@@ -255,12 +246,12 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
       },
     });
     if (program == null) {
-      return reply.code(404).send();
+      return c.text('', 404);
     }
-    reply.code(200).send(program);
+    return c.json(program);
   });
 
-  api.get('/recommended/:referenceId', async (req, reply) => {
+  api.get('/recommended/:referenceId', async (c) => {
     const database = getDatabase();
 
     const modules = await database.query.recommendedModule.findMany({
@@ -268,7 +259,7 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
         return asc(module.order);
       },
       where(module, { eq }) {
-        return eq(module.referenceId, req.params.referenceId);
+        return eq(module.referenceId, c.req.param('referenceId'));
       },
       with: {
         items: {
@@ -283,64 +274,66 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
       },
     });
 
-    reply.code(200).send(modules);
+    return c.json(modules);
   });
 
-  api.post('/signIn', async (req, reply) => {
+  api.post('/signIn', async (c) => {
     const database = getDatabase();
+    const body = await c.req.json();
 
     const user = await database.query.user.findFirst({
       where(user, { eq }) {
-        return eq(user.email, req.body.email);
+        return eq(user.email, body.email);
       },
     });
-    if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
-      return reply.code(401).send();
+    if (!user || !bcrypt.compareSync(body.password, user.password)) {
+      return c.text('', 401);
     }
 
     const ret = schema.signInResponse.parse({ id: user.id, email: user.email });
 
-    req.session.set('id', ret.id.toString());
-    reply.code(200).send(user);
+    await cookie.setSignedCookie(c, cookieName, ret.id.toString(), secret, { path: '/' });
+    return c.json(user);
   });
 
-  api.post('/signUp', async (req, reply) => {
+  api.post('/signUp', async (c) => {
     const database = getDatabase();
+    const body = await c.req.json();
 
     const hasAlreadyExists = await database.query.user.findFirst({
       where(user, { eq }) {
-        return eq(user.email, req.body.email);
+        return eq(user.email, body.email);
       },
     });
     if (hasAlreadyExists) {
-      return reply.code(400).send();
+      return c.text('', 400);
     }
 
     const users = await database
       .insert(databaseSchema.user)
       .values({
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 10),
+        email: body.email,
+        password: bcrypt.hashSync(body.password, 10),
       })
       .returning();
 
-    const user = users.find((u) => u.email === req.body.email);
+    const user = users.find((u) => u.email === body.email);
     if (!user) {
-      return reply.code(500).send();
+      return c.text('', 500);
     }
 
     const ret = schema.signUpResponse.parse({ id: user.id, email: user.email });
 
-    req.session.set('id', ret.id.toString());
-    reply.code(200).send(ret);
+    await cookie.setSignedCookie(c, cookieName, ret.id.toString(), secret, { path: '/' });
+    return c.json(ret);
   });
 
-  api.get('/users/me', async (req, reply) => {
+  api.get('/users/me', async (c) => {
     const database = getDatabase();
 
-    const userId = req.session.get('id');
+    const userId = await cookie.getSignedCookie(c, secret, cookieName);
     if (!userId) {
-      return reply.code(401).send();
+      return c.text('', 401);
     }
 
     const user = await database.query.user.findFirst({
@@ -349,19 +342,20 @@ export async function registerApi(app: FastifyInstance): Promise<void> {
       },
     });
     if (!user) {
-      return reply.code(401).send();
+      return c.text('', 401);
     }
-    reply.code(200).send(user);
+    return c.json(user);
   });
 
-  api.post('/signOut', async (req, reply) => {
-    const userId = req.session.get('id');
+  api.post('/signOut', async (c) => {
+    const userId = await cookie.getSignedCookie(c, secret, cookieName);
     if (!userId) {
-      return reply.code(401).send();
+      return c.text('', 401);
     }
-    req.session.set('id', void 0);
-    reply.code(200).send();
+    await cookie.setSignedCookie(c, cookieName, '', secret, { path: '/' });
+    return c.text('', 200);
   });
 
+  return api;
   /* eslint-enable sort/object-properties */
 }
