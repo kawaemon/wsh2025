@@ -17,14 +17,16 @@ interface Props {
 export const JumbotronSection = ({ module }: Props) => {
   const playerRef = useRef<PlayerWrapper>(null);
 
-  const episode = module.items[0]?.episode;
+  const item = module.items[0];
+  invariant(item);
+  const episode = item.episode;
   invariant(episode);
 
   return (
     <NavLink
       viewTransition
       className="block flex h-[260px] w-full flex-row items-center justify-center overflow-hidden rounded-[8px] bg-[#171717] hover:opacity-50"
-      to={`/episodes/${episode.id}`}
+      to={`/episodes/${item.episodeId}`}
     >
       {({ isTransitioning }) => {
         return (
@@ -38,14 +40,14 @@ export const JumbotronSection = ({ module }: Props) => {
               </div>
             </div>
 
-            <Flipped stagger flipId={isTransitioning ? `episode-${episode.id}` : 0}>
+            <Flipped stagger flipId={isTransitioning ? `episode-${item.episodeId}` : 0}>
               <div className="aspect-16/9 h-full w-auto shrink-0 grow-0">
                 <Player
                   loop
                   className="size-full"
                   playerRef={playerRef}
                   playerType={PlayerType.HlsJS}
-                  playlistUrl={`/streams/episode/${episode.id}/playlist.m3u8`}
+                  playlistUrl={`/streams/episode/${item.episodeId}/playlist.m3u8`}
                 />
               </div>
             </Flipped>
