@@ -20,12 +20,16 @@ function getTime(d: Date): number {
 export function registerStreams(): Hono {
   const app = new Hono();
   app.use(
-    '/streams/',
+    '/streams/*',
     serveStatic({
       onFound: (_p, c) => {
         c.header('cache-control', 'public, max-age=2592000, immutable');
       },
-      root: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../streams'),
+      rewriteRequestPath: (p) => {
+        const res = p.replace(/^\/streams/, '');
+        return res;
+      },
+      root: path.relative(process.cwd(), path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../streams')),
     }),
   );
 

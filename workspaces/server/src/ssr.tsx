@@ -33,12 +33,11 @@ export function registerSsr(): Hono {
         onFound: (_p, c) => {
           c.header('cache-control', 'public, max-age=2592000, immutable');
         },
-        root,
         rewriteRequestPath: (p) => {
           const res = p.replace(/^\/public/, '');
-          console.log({ p, res });
           return res;
         },
+        root,
       }),
     ),
   );
