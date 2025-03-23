@@ -1,9 +1,10 @@
-import { readdirSync, readFileSync, existsSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { FastifyInstance } from 'fastify';
+import { cacheable } from '@wsh-2025/server/src/util';
 
 function getFiles(parent: string): string[] {
   const dirents = readdirSync(parent, { withFileTypes: true });
@@ -52,18 +53,18 @@ export function registerSsr(app: FastifyInstance): void {
 
       if (existsSync(brPath)) {
         reply.header('Content-Encoding', 'br');
-        reply.header('cache-control', 'public, max-age=2592000, immutable');
+        cacheable(reply);
         reply.type(mime).send(await fsp.readFile(brPath));
         return;
       }
       if (existsSync(gzPath)) {
         reply.header('Content-Encoding', 'gzip');
-        reply.header('cache-control', 'public, max-age=2592000, immutable');
+        cacheable(reply);
         reply.type(mime).send(await fsp.readFile(gzPath));
         return;
       }
       if (existsSync(filePath)) {
-        reply.header('cache-control', 'public, max-age=2592000, immutable');
+        cacheable(reply);
         reply.type(mime).send(await fsp.readFile(filePath));
         return;
       }
