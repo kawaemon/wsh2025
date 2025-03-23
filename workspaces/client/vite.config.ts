@@ -6,7 +6,13 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: '/public',
   build: {
+    minify: 'terser',
     modulePreload: true,
+    terserOptions: {
+      compress: {
+        passes: 5,
+      },
+    },
     rollupOptions: {
       output: {
         chunkFileNames: 'chunk-[hash].js',
